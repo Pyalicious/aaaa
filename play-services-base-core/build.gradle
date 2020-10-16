@@ -9,7 +9,6 @@ dependencies {
     api project(':play-services-basement')
 
     implementation "androidx.annotation:annotation:$annotationVersion"
-    implementation "androidx.lifecycle:lifecycle-service:$lifecycleVersion"
 }
 
 android {

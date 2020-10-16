@@ -5,6 +5,7 @@
 
 package org.microg.gms.ui
 
+import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -13,6 +14,7 @@ import com.google.android.gms.R
 import org.microg.gms.checkin.getCheckinServiceInfo
 import org.microg.gms.gcm.GcmDatabase
 import org.microg.gms.gcm.getGcmServiceInfo
+import org.microg.gms.nearby.exposurenotification.getExposureNotificationsServiceInfo
 import org.microg.gms.snet.getSafetyNetServiceInfo
 import org.microg.nlp.client.UnifiedLocationClient
 import org.microg.tools.ui.ResourceSettingsFragment
@@ -38,7 +40,7 @@ class SettingsFragment : ResourceSettingsFragment() {
             true
         }
         findPreference<Preference>(PREF_EXPOSURE)!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-            findNavController().navigate(requireContext(), NearbyPreferencesIntegration.exposureNotificationNavigationId)
+            findNavController().navigate(requireContext(), R.id.openExposureNotificationSettings)
             true
         }
         findPreference<Preference>(PREF_ABOUT)!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -71,8 +73,16 @@ class SettingsFragment : ResourceSettingsFragment() {
         val backendCount = UnifiedLocationClient[requireContext()].getLocationBackends().size + UnifiedLocationClient[requireContext()].getGeocoderBackends().size
         findPreference<Preference>(PREF_UNIFIEDNLP)!!.summary = resources.getQuantityString(R.plurals.pref_unifiednlp_summary, backendCount, backendCount);
 
-        findPreference<Preference>(PREF_EXPOSURE)!!.isVisible = NearbyPreferencesIntegration.isAvailable
-        findPreference<Preference>(PREF_EXPOSURE)!!.summary = NearbyPreferencesIntegration.getExposurePreferenceSummary(requireContext())
+        if (Build.VERSION.SDK_INT >= 21) {
+            findPreference<Preference>(PREF_EXPOSURE)!!.isVisible = true
+            if (getExposureNotificationsServiceInfo(requireContext()).configuration.enabled) {
+                findPreference<Preference>(PREF_EXPOSURE)!!.summary = getString(R.string.service_status_enabled_short)
+            } else {
+                findPreference<Preference>(PREF_EXPOSURE)!!.setSummary(R.string.service_status_disabled_short)
+            }
+        } else {
+            findPreference<Preference>(PREF_EXPOSURE)!!.isVisible = false
+        }
     }
 
     companion object {

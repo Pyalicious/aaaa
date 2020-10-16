@@ -25,7 +25,6 @@ buildscript {
 
     ext.supportLibraryVersion = '28.0.0'
     ext.slf4jVersion = '1.7.25'
-    ext.volleyVersion = '1.1.1'
     ext.wireVersion = '3.2.2'
 
     ext.androidBuildGradleVersion = '3.6.3'
@@ -34,7 +33,7 @@ buildscript {
 
     ext.androidMinSdk = 14
     ext.androidTargetSdk = 29
-    ext.androidCompileSdk = 30
+    ext.androidCompileSdk = 29
 
     repositories {
         jcenter()

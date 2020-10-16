@@ -20,7 +20,6 @@ import android.accounts.Account;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import com.google.android.gms.common.Feature;
 import com.google.android.gms.common.api.Scope;
 
 import org.microg.gms.common.Constants;
@@ -31,32 +30,32 @@ import org.microg.safeparcel.SafeParceled;
 import java.util.Arrays;
 
 public class GetServiceRequest extends AutoSafeParcelable {
-    @Field(1)
-    private int versionCode = 4;
-    @Field(2)
+    @SafeParceled(1)
+    private int versionCode = 3;
+
+    @SafeParceled(2)
     public final int serviceId;
-    @Field(3)
+
+    @SafeParceled(3)
     public int gmsVersion;
-    @Field(4)
+
+    @SafeParceled(4)
     public String packageName;
-    @Field(5)
+
+    @SafeParceled(5)
     public IBinder accountAccessor;
-    @Field(6)
+
+    @SafeParceled(6)
     public Scope[] scopes;
-    @Field(7)
+
+    @SafeParceled(7)
     public Bundle extras;
-    @Field(8)
+
+    @SafeParceled(8)
     public Account account;
-    @Field(9)
-    private long field9;
-    @Field(10)
-    public Feature[] defaultFeatures;
-    @Field(11)
-    public Feature[] apiFeatures;
-    @Field(12)
-    private boolean field12;
-    @Field(13)
-    private int field13;
+
+    @SafeParceled(9)
+    public long long1;
 
     private GetServiceRequest() {
         serviceId = -1;
@@ -66,7 +65,6 @@ public class GetServiceRequest extends AutoSafeParcelable {
     public GetServiceRequest(int serviceId) {
         this.serviceId = serviceId;
         this.gmsVersion = Constants.MAX_REFERENCE_VERSION;
-        this.field12 = true;
     }
 
     @Override

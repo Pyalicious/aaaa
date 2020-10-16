@@ -30,9 +30,6 @@ public class ClearcutLoggerServiceImpl extends IClearcutLoggerService.Stub {
     @Override
     public void log(IClearcutLoggerCallbacks callbacks, LogEventParcelable event) throws RemoteException {
         Log.d(TAG, "log: " + event);
-        try {
-            callbacks.onStatus(Status.SUCCESS);
-        } catch (Exception ignored) {
-        }
+        callbacks.onStatus(Status.SUCCESS);
     }
 }

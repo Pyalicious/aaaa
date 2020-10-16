@@ -27,7 +27,7 @@ public class TemporaryExposureKey extends AutoSafeParcelable {
     }
 
     TemporaryExposureKey(byte[] keyData, int rollingStartIntervalNumber, @RiskLevel int transmissionRiskLevel, int rollingPeriod) {
-        this.keyData = (keyData == null ? new byte[0] : keyData);
+        this.keyData = keyData;
         this.rollingStartIntervalNumber = rollingStartIntervalNumber;
         this.transmissionRiskLevel = transmissionRiskLevel;
         this.rollingPeriod = rollingPeriod;

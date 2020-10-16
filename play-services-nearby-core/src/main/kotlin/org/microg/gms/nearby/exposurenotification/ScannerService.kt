@@ -18,19 +18,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.*
 import android.util.Log
-import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.lifecycleScope
 import org.microg.gms.common.ForegroundServiceContext
 import java.io.FileDescriptor
 import java.io.PrintWriter
 import java.util.*
 
 @TargetApi(21)
-class ScannerService : LifecycleService() {
+class ScannerService : Service() {
     private var scanning = false
     private var lastStartTime = 0L
     private var seenAdvertisements = 0L
     private var lastAdvertisement = 0L
+    private lateinit var database: ExposureDatabase
     private val callback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             result?.let { onScanResult(it) }
@@ -83,13 +82,9 @@ class ScannerService : LifecycleService() {
     fun onScanResult(result: ScanResult) {
         val data = result.scanRecord?.serviceData?.get(SERVICE_UUID) ?: return
         if (data.size < 16) return // Ignore invalid advertisements
+        database.noteAdvertisement(data.sliceArray(0..15), data.drop(16).toByteArray(), result.rssi)
         seenAdvertisements++
         lastAdvertisement = System.currentTimeMillis()
-        lifecycleScope.launchWhenStarted {
-            ExposureDatabase.with(this@ScannerService) { database ->
-                database.noteAdvertisement(data.sliceArray(0..15), data.drop(16).toByteArray(), result.rssi)
-            }
-        }
     }
 
     fun startScanIfNeeded() {
@@ -102,6 +97,7 @@ class ScannerService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+        database = ExposureDatabase.ref(this)
         registerReceiver(trigger, IntentFilter().also { it.addAction("android.bluetooth.adapter.action.STATE_CHANGED") })
     }
 
@@ -109,6 +105,11 @@ class ScannerService : LifecycleService() {
         super.onDestroy()
         unregisterReceiver(trigger)
         stopScan()
+        database.unref()
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
     }
 
     @SuppressLint("WakelockTimeout")

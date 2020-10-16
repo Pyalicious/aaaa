@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CheckinManager {
-    private static final String TAG = "GmsCheckinManager";
+	private static final String TAG = "GmsCheckinManager";
     private static final long MIN_CHECKIN_INTERVAL = 3 * 60 * 60 * 1000; // 3 hours
 
     @SuppressWarnings("MissingPermission")
@@ -82,8 +82,8 @@ public class CheckinManager {
 
         return info;
     }
-
-    private static boolean hasGooglePlayServices(Context context) {
+	
+	private static boolean hasGooglePlayServices(Context context) {
         boolean hasGooglePlayServices = false;
         try {
             // We will assume that the user has Google Play services installed if context is null
@@ -99,4 +99,3 @@ public class CheckinManager {
         return hasGooglePlayServices;
     }
 }
-

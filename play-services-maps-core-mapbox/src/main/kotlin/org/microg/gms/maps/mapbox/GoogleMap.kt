@@ -17,6 +17,7 @@
 package org.microg.gms.maps.mapbox
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.location.Location
 import android.os.*
@@ -40,16 +41,14 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.R
 import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.constants.MapboxConstants
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.modes.CameraMode
-import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.*
 import com.mapbox.mapboxsdk.plugins.annotation.Annotation
 import com.mapbox.mapboxsdk.style.layers.Property.LINE_CAP_ROUND
+import com.mapbox.mapboxsdk.utils.ColorUtils
+import com.mapbox.mapboxsdk.utils.ThreadUtils
 import org.microg.gms.kotlin.unwrap
 import org.microg.gms.maps.MapsConstants.*
 import org.microg.gms.maps.mapbox.model.*
@@ -113,12 +112,8 @@ class GoogleMapImpl(private val context: Context, var options: GoogleMapOptions)
     val markers = mutableMapOf<Long, MarkerImpl>()
     var markerId = 0L
 
-    var groundId = 0L
-    var tileId = 0L
-
     var storedMapType: Int = options.mapType
     val waitingCameraUpdates = mutableListOf<CameraUpdate>()
-    var locationEnabled: Boolean = false
 
     init {
         val mapContext = MapContext(context)
@@ -292,12 +287,12 @@ class GoogleMapImpl(private val context: Context, var options: GoogleMapOptions)
 
     override fun addGroundOverlay(options: GroundOverlayOptions): IGroundOverlayDelegate? {
         Log.d(TAG, "unimplemented Method: addGroundOverlay")
-        return GroundOverlayImpl(this, "g${groundId++}", options)
+        return null
     }
 
     override fun addTileOverlay(options: TileOverlayOptions): ITileOverlayDelegate? {
         Log.d(TAG, "unimplemented Method: addTileOverlay")
-        return TileOverlayImpl(this, "t${tileId++}", options)
+        return null
     }
 
     override fun addCircle(options: CircleOptions): ICircleDelegate? {
@@ -390,24 +385,13 @@ class GoogleMapImpl(private val context: Context, var options: GoogleMapOptions)
     }
 
     override fun isMyLocationEnabled(): Boolean {
-        return locationEnabled
+        Log.d(TAG, "unimplemented Method: isMyLocationEnabled")
+        return false
     }
 
     override fun setMyLocationEnabled(myLocation: Boolean) {
-        synchronized(mapLock) {
-            locationEnabled = myLocation
-            if (!loaded) return
-            val locationComponent = map?.locationComponent ?: return
-            try {
-                if (locationComponent.isLocationComponentActivated) {
-                    locationComponent.isLocationComponentEnabled = myLocation
-                }
-            } catch (e: SecurityException) {
-                Log.w(TAG, e)
-                locationEnabled = false
-            }
-            Unit
-        }
+        Log.d(TAG, "unimplemented Method: setMyLocationEnabled")
+
     }
 
     override fun getMyLocation(): Location? {
@@ -415,7 +399,7 @@ class GoogleMapImpl(private val context: Context, var options: GoogleMapOptions)
         return null
     }
 
-    override fun setLocationSource(locationSource: ILocationSourceDelegate?) {
+    override fun setLocationSource(locationSource: ILocationSourceDelegate) {
         Log.d(TAG, "unimplemented Method: setLocationSource")
     }
 
@@ -705,22 +689,7 @@ class GoogleMapImpl(private val context: Context, var options: GoogleMapOptions)
                 pendingMarkers.forEach { it.update(symbolManager) }
                 pendingMarkers.clear()
 
-                val mapContext = MapContext(context)
-                map.locationComponent.apply {
-                    activateLocationComponent(LocationComponentActivationOptions.builder(mapContext, it)
-                            .locationComponentOptions(LocationComponentOptions.builder(mapContext).pulseEnabled(true).build())
-                            .build())
-                    cameraMode = CameraMode.TRACKING
-                    renderMode = RenderMode.COMPASS
-                }
-
                 synchronized(mapLock) {
-                    try {
-                        map.locationComponent.isLocationComponentEnabled = locationEnabled
-                    } catch (e: SecurityException) {
-                        Log.w(TAG, e)
-                        locationEnabled = false
-                    }
                     loaded = true
                     if (loadedCallback != null) {
                         Log.d(TAG, "Invoking callback delayed, as map is loaded")

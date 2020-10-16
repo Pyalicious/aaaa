@@ -26,23 +26,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CastOptions extends AutoSafeParcelable {
-    @Field(1)
+    @SafeParceled(1)
     private int versionCode = 1;
-    @Field(2)
+
+    @SafeParceled(2)
     private String receiverApplicationId;
-    @Field(3)
+
+    @SafeParceled(3)
     private ArrayList<String> supportedNamespaces;
-    @Field(4)
+
+    @SafeParceled(4)
     private boolean stopReceiverApplicationWhenEndingSession;
-    @Field(5)
+
+    @SafeParceled(5)
     private LaunchOptions launchOptions;
-    @Field(6)
+
+    @SafeParceled(6)
     private boolean resumeSavedSession;
-    @Field(7)
+
+    @SafeParceled(7)
     private CastMediaOptions castMediaOptions;
-    @Field(8)
+
+    @SafeParceled(8)
     private boolean enableReconnectionService;
-    @Field(9)
+
+    @SafeParceled(9)
     private double volumeDeltaBeforeIceCreamSandwich;
 
     public String getReceiverApplicationId() {
